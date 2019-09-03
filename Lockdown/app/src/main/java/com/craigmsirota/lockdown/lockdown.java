@@ -84,7 +84,6 @@ public class lockdown extends AppCompatActivity {
         send("127.0.0.1","test","45/45");
     }
 
-    public void tv(String msg) {((TextView) findViewById(R.id.textView6)).setText(msg);}
     public void setCoord(String c) {
         coord = c;
     }
@@ -138,8 +137,7 @@ public class lockdown extends AppCompatActivity {
 
         Thread thread = new Thread(myRunnable);
         thread.start();
-        while(msg == ""){}
-        tv(msg);
+        while(msg == ""){int z =0;}
         return true;
     }
 

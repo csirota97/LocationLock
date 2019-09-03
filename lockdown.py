@@ -11,12 +11,13 @@ except:
 msg = ""
 longitude = ""
 latitude = ""
+wrong = False
 
 password = getpass()
 
 
 def connect():
-    global longitude, latitude
+    global longitude, latitude, wrong
     '''
     client, addr = s.accept()
 
@@ -25,10 +26,8 @@ def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('',17388))
     msg_size = s.recv(3)
-    print(msg_size)
     msg_size = int(msg_size.decode('utf-8'))
     msg = s.recv(msg_size).decode('utf-8')
-    print("\n"+msg)
     p = msg.split('/')[0]
     k = int(float(msg.split('/')[3]))
     try:
@@ -36,9 +35,11 @@ def connect():
             if ord(p[i])^k != ord(password[i]):
             #if p[i] != password[i]
                 print("Password does not match\nExiting now")
-                exit(-1)
+                wrong = True
+                return
     except:
         print("Password does not match\nExiting now")
+        wrong = True
         exit(-1)
 
     longitude = float(msg.split('/')[1])
@@ -57,11 +58,13 @@ def waiting():
             print(i, end = "")
             time.sleep(.5)
 
-
-        try:
-            os.system("clear")
-        except:
-            os.system("cls")
+        if wrong == True:
+            exit(-1)
+        else:
+            try:
+                os.system("clear")
+            except:
+                os.system("cls")
         
 
         '''
@@ -89,35 +92,58 @@ def waiting():
 
     time.sleep(.5)
     
-    try:
-        os.system("clear")
-    except:
-        os.system("cls")
-    
+    if wrong == True:
+
+        exit(-1)
+    else:
+        try:
+            os.system("clear")
+        except:
+            os.system("cls")
+
 
 t = threading.Thread(target = connect, name = "connect")
 t2 = threading.Thread(target = waiting, name = "wait")
 
-client = None
-addr = ""
+def main():
+    try:
+        client = None
+        addr = ""
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('',17389))
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind(('',17389))
 
 
-t.start()
-t2.start()
+        t.start()
+        t2.start()
 
-#print("connecting".upper())
-t.join()
-t2.join()
+        #print("connecting".upper())
+        t.join()
+        t2.join()
 
-file_name = input("file name:\n>\t")
 
-with open(file_name) as f:
-    msg = e.encrypt(longitude, latitude, f.read())
+        if wrong == True:
+            return
 
-file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
+        file_name = input("file name:\n>\t")
 
-with open(file_name, 'w') as f:
-    f.write(msg)
+        with open(file_name) as f:
+            msg = e.encrypt(longitude, latitude, f.read())
+
+        option = input("(E)ncrypt or (D)ecrypt:\n>\t")
+
+        if option.upper() == 'D:'
+            file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
+
+        with open(file_name, 'w') as f:
+            f.write(msg)
+    except:
+        try:
+            os.system("clear")
+        except:
+            os.system("cls")
+
+        print("Password does not match\nExiting now")
+
+
+main()
