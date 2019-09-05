@@ -2,6 +2,8 @@ import encrypt as e
 import geocoder as g
 import threading, time, os, socket
 from getpass import getpass
+import sys
+sys.argv.pop(0)
 
 try:
     os.system("clear")
@@ -124,26 +126,45 @@ def main():
 
         if wrong == True:
             return
+        
+        if len(sys.argv) == 0:
+            file_name = input("file name:\n>\t")
+            arg = False    
+        
 
-        file_name = input("file name:\n>\t")
+            with open(file_name) as f:
+                msg = e.encrypt(longitude, latitude, f.read())
 
-        with open(file_name) as f:
-            msg = e.encrypt(longitude, latitude, f.read())
+            option = input("(E)ncrypt or (D)ecrypt:\n>\t")
 
-        option = input("(E)ncrypt or (D)ecrypt:\n>\t")
+            if option.upper() == 'D':
+                file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
 
-        if option.upper() == 'D:'
-            file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
+            with open(file_name, 'w') as f:
+                f.write(msg)
+        else:
+            option = input("(E)ncrypt or (D)ecrypt:\n>\t")
 
-        with open(file_name, 'w') as f:
-            f.write(msg)
+            while len(sys.argv) > 0:
+                file_name = sys.argv.pop(0)
+        
+
+                with open(file_name) as f:
+                    msg = e.encrypt(longitude, latitude, f.read())
+
+
+                if option.upper() == 'D':
+                    file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
+
+                with open(file_name, 'w') as f:
+                    f.write(msg)
     except:
         try:
             os.system("clear")
         except:
             os.system("cls")
 
-        print("Password does not match\nExiting now")
+        print("ERROR\nExiting now")
 
 
 main()
