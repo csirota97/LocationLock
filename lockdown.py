@@ -3,7 +3,28 @@ import geocoder as g
 import threading, time, os, socket
 from getpass import getpass
 import sys
+import socket, traceback
+import tkinter as tk
+from tkinter import filedialog
+
+
+root = tk.Tk()
+root.withdraw()
+
 sys.argv.pop(0)
+def pad(str, length):
+    while len(str) < length:
+        str = '0' + str
+
+    return str
+
+def sithex(str):
+    return pad(hex(int(str))[2:],2)
+
+
+hostname = socket.gethostname()    
+IPAddr = socket.gethostbyname(hostname)
+key = "".join(list(map(sithex, IPAddr.split('.'))))
 
 try:
     os.system("clear")
@@ -51,7 +72,7 @@ def connect():
     
 
 def waiting():
-    c = ["connecting\r","connecting.\r","connecting..\r","connecting...\r"]
+    c = [f"connecting\tKEY={key}\r",f"connecting.\tKEY={key}\r",f"connecting..\tKEY={key}\r",f"connecting...\tKEY={key}\r"]
     while t.is_alive():
 
         for i in c:
@@ -108,6 +129,7 @@ t = threading.Thread(target = connect, name = "connect")
 t2 = threading.Thread(target = waiting, name = "wait")
 
 def main():
+    msg = ""
     try:
         client = None
         addr = ""
@@ -128,11 +150,12 @@ def main():
             return
         
         if len(sys.argv) == 0:
-            file_name = input("file name:\n>\t")
+            #            file_name = input("file name:\n>\t")
+            file_name = filedialog.askopenfilename()
             arg = False    
         
 
-            with open(file_name) as f:
+            with open(file_name, encoding="utf-8", errors='ignore') as f:
                 msg = e.encrypt(longitude, latitude, f.read())
 
             option = input("(E)ncrypt or (D)ecrypt:\n>\t")
@@ -148,22 +171,22 @@ def main():
             while len(sys.argv) > 0:
                 file_name = sys.argv.pop(0)
         
+                with open(file_name, encoding="utf-8", errors='ignore') as f:
+                    for line in f:
+                        msg += e.encrypt(longitude, latitude, line)
 
-                with open(file_name) as f:
-                    msg = e.encrypt(longitude, latitude, f.read())
-
+            
 
                 if option.upper() == 'D':
                     file_name = file_name[:file_name.index('.')]+'_decrypted' + file_name[file_name.index('.'):]
-
                 with open(file_name, 'w') as f:
                     f.write(msg)
-    except:
+    except Exception as err:
         try:
             os.system("clear")
         except:
             os.system("cls")
-
+        traceback.print_exc()
         print("ERROR\nExiting now")
 
 

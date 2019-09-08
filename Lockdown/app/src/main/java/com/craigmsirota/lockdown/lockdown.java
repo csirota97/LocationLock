@@ -76,7 +76,12 @@ public class lockdown extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                send(ip.getText().toString(), pass.getText().toString(),coord);
+                String ip_addr = Integer.parseInt(ip.getText().toString().substring(0,2),16) +"." +
+                                    Integer.parseInt(ip.getText().toString().substring(2,4),16) +"."+
+                                    Integer.parseInt(ip.getText().toString().substring(4,6),16) +"."+
+                                    Integer.parseInt(ip.getText().toString().substring(6,8),16);
+
+                send(ip_addr, pass.getText().toString(),coord);
 
 
             }
